@@ -28,6 +28,7 @@ class TestParserSandboxTimeoutCleanup:
         from backend.secuscan.parser_sandbox import run_parser_in_sandbox, _sanitised_env
         from backend.secuscan.parser_sandbox import _BOOTSTRAP_TEMPLATE
         import json
+        import sys
 
         # Write a parser that sleeps long enough to be killed.
         parser = tmp_path / "parser.py"
@@ -35,7 +36,7 @@ class TestParserSandboxTimeoutCleanup:
 
         with pytest.raises(subprocess.TimeoutExpired):
             proc = subprocess.Popen(
-                ["python3", "-c", _BOOTSTRAP_TEMPLATE.safe_substitute(
+                [sys.executable, "-c", _BOOTSTRAP_TEMPLATE.safe_substitute(
                     parser_path_repr=repr(str(parser)),
                     max_input_bytes=1024,
                 )],
@@ -55,6 +56,7 @@ class TestParserSandboxTimeoutCleanup:
         """Threads reading from killed subprocess must complete within the join timeout."""
         from backend.secuscan.parser_sandbox import run_parser_in_sandbox, _sanitised_env
         from backend.secuscan.parser_sandbox import _BOOTSTRAP_TEMPLATE
+        import time
 
         parser = tmp_path / "parser.py"
         parser.write_text("import time; time.sleep(60)\n", encoding="utf-8")
@@ -87,7 +89,7 @@ class TestParserSandboxTimeoutCleanup:
         parser = tmp_path / "parser.py"
         # Write to stderr before sleeping.
         parser.write_text(
-            "import sys, time; sys.stderr.write('early error\\n'); time.sleep(60)\n",
+            "import sys, time; sys.stderr.write('early error\n'); time.sleep(60)\n",
             encoding="utf-8",
         )
 

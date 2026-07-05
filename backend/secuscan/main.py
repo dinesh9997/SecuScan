@@ -70,8 +70,8 @@ async def lifespan(app: FastAPI):
     await init_db(settings.database_path)
     logger.info("✓ SQLite connected")
 
-    await init_cache()
-    logger.info("✓ In-memory cache initialized")
+    await init_cache(settings.redis_url)
+    logger.info("✓ Cache initialized")
     
     # ─── RATE LIMITER SETUP ──────────────────────────────────────────────
     # Initialize rate limiter with Redis client from cache
